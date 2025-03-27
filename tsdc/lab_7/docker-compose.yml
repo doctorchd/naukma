@@ -1,0 +1,42 @@
+services:
+ db:
+    image: mysql:8.0
+    command: --default-authentication-plugin=mysql_native_password
+    container_name: db
+    restart: unless-stopped
+    environment:
+      - MYSQL_ROOT_PASSWORD=dbrootpass
+      - MYSQL_DATABASE=wordpress
+      - MYSQL_USER=wpress
+      - MYSQL_PASSWORD=dbpass
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - app-network
+
+ wordpress:
+    depends_on:
+      - db
+    image: wordpress:php8.1-apache
+    container_name: wordpress
+    restart: unless-stopped
+    ports:
+      - "80:80"
+    environment:
+      - WORDPRESS_DB_HOST=db
+      - WORDPRESS_DB_NAME=wordpress
+      - WORDPRESS_DB_USER=wpress
+      - WORDPRESS_DB_PASSWORD=dbpass
+    volumes:
+      - wordpress:/var/www/html
+    networks:
+      - app-network
+
+volumes:
+  dbdata:
+  wordpress:
+
+networks:
+  app-network:
+    driver: bridge
+
